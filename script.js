@@ -7,8 +7,45 @@ const apiKey = "819acc1726b97dcc63167105cf1fc047";
  
 form.addEventListener("submit", e => {
   e.preventDefault();
-  const listItems = list.querySelectorAll(".ajax-section .city");
-  const inputVal = input.value;
+  let inputVal = input.value;
+
+
+
+const listItems = list.querySelectorAll(".ajax-section .city");
+const listItemsArray = Array.from(listItems);
+ 
+if (listItemsArray.length > 0) {
+  const filteredArray = listItemsArray.filter(el => {
+    let content = "";
+    if (inputVal.includes(",")) {
+      if (inputVal.split(",")[1].length > 2) {
+        inputVal = inputVal.split(",")[0];
+        content = el.querySelector(".city-name span").textContent.toLowerCase();
+      } else {
+        content = el.querySelector(".city-name").dataset.name.toLowerCase();
+      }
+    } else {
+      
+      content = el.querySelector(".city-name span").textContent.toLowerCase();
+    }
+    return content == inputVal.toLowerCase();
+  });
+   
+  
+  if (filteredArray.length > 0) {
+    msg.textContent = `Don't you already know the weather for ${
+      filteredArray[0].querySelector(".city-name span").textContent
+    } ...just look down a little 😉`;
+    form.reset();
+    input.focus();
+    return;
+  }
+}
+
+
+
+
+
 
 //AJAX request
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${inputVal}&appid=${apiKey}&units=metric`;
@@ -17,9 +54,9 @@ form.addEventListener("submit", e => {
   .then(response => response.json())
   .then(data => {
     const { main, name, sys, weather } = data;
-      const icon = `https://openweathermap.org/img/wn/${
-        weather[0]["icon"]
-      }@2x.png`;
+      const icon = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/${
+  weather[0]["icon"]
+}.svg`;
 
       const li = document.createElement("li");
       li.classList.add("city");
